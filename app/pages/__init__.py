@@ -1,0 +1,2 @@
+from .stocks_search_page import StocksSearchPage
+from .stocks_results_page import StocksResultsPage
