@@ -26,13 +26,13 @@ class StocksResultsPage(BasePage):
         table_cell = (By.CSS_SELECTOR, 'td')
 
     def get_current_results(self):
-        column_names = ['symbol', 'name', 'price_intraday']
 
         def row_to_dict(row):
-            cols = self.find_all(root=row, locator=self.Locators.table_cell)
-            values = [col.get_attribute('innerText') for col in cols]
-            values_dict = {key: value for key, value in zip(column_names, values)}
-            return values_dict
+            cells = self.find_all(root=row, locator=self.Locators.table_cell)
+            return {
+                cell.get_attribute('aria-label'): cell.get_attribute('innerText')
+                for cell in cells
+            }
 
         rows = self.find_all(self.Locators.result_rows)
         results = [row_to_dict(row) for row in rows]
@@ -61,3 +61,9 @@ class StocksResultsPage(BasePage):
     def wait_pagination(self):
         self.wait_until(ec.presence_of_element_located(self.Locators.loading_overlay_present))
         self.wait_until(ec.presence_of_element_located(self.Locators.loading_overlay_not_present))
+
+    def get_all_results(self):
+        while self.has_next_page():
+            print('got page')
+            yield from self.get_current_results()
+            self.next_page()

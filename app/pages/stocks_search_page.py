@@ -15,7 +15,7 @@ class StocksSearchPage(BasePage):
         find_stocks_button = (By.CSS_SELECTOR, 'button[data-test=find-stock]')
         results_table = (By.CSS_SELECTOR, '#fin-scr-res-table table')
 
-    class Region:
+    class Checkbox:
         def __init__(self, element):
             self.name = element.get_attribute('innerText')
             self.element = element
@@ -34,7 +34,7 @@ class StocksSearchPage(BasePage):
         region_checkboxes = self.find_all(self.Locators.region_checkboxes)
 
         regions_by_name = {
-            element.get_attribute('innerText'): self.Region(element)
+            element.get_attribute('innerText'): self.Checkbox(element)
             for element in region_checkboxes
         }
 
