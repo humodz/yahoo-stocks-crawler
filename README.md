@@ -1,5 +1,14 @@
 # yahoo-news-crawler
 
+### Dependencies
+
+- python3
+    - selenium
+    - fastapi
+    - uvicorn[standard]
+- chromedriver
+    - https://sites.google.com/a/chromium.org/chromedriver/downloads
+
 ### TODO
 
 - [ ] dependencias
@@ -7,3 +16,4 @@
  - [ ] fazer requirements txt
 - [ ] webdriver
  - [ ] achar jeito legal de baixar driver e navegador
+- [ ] docker-compose
