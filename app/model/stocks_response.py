@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from pydantic import BaseModel
 
@@ -8,7 +8,7 @@ from app.utils import parse_amount
 class StockItem(BaseModel):
     symbol: str
     name: str
-    price: str
+    price: Optional[str]
 
     @classmethod
     def from_table_row(cls, data):
