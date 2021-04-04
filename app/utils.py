@@ -71,5 +71,4 @@ class ChromeDriver:
 
     def __exit__(self, *args, **kwargs):
         if self.driver:
-            return
             self.driver.quit()

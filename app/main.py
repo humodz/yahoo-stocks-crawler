@@ -4,7 +4,7 @@ from time import time
 from fastapi import FastAPI, Depends
 
 from app.pages import StocksSearchPage
-from app.utils import ChromeDriver, benchmark_function
+from app.utils import ChromeDriver, benchmark_function, parse_amount
 
 data = dict()
 
@@ -45,9 +45,8 @@ def get_regions():
         search_form = StocksSearchPage(driver)
         search_form.open()
         regions_dict = search_form.open_regions_dropdown()
-        regions = list(regions_dict.keys())
         return {
-            'regions': regions
+            'regions': list(regions_dict.keys())
         }
 
 
@@ -58,14 +57,22 @@ def get_stocks(region: str):
         search_form.open()
 
         regions = search_form.open_regions_dropdown()
+        # TODO validate region
         regions[region].toggle()
 
         results_page = search_form.search_stocks()
         results_page.set_rows_per_page(100)
 
-        results = list(results_page.get_all_results())
+        raw_results = list(results_page.get_all_results())
 
-        return {
-            'results': results,
+        results = {
+            item['Symbol']: {
+                'symbol': item['Symbol'],
+                'name': item['Name'],
+                'price': '{:.2f}'.format(parse_amount(item['Price (Intraday)'])),
+            }
+            for item in raw_results
         }
+
+        return results
 

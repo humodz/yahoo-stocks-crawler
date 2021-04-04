@@ -50,11 +50,9 @@ class StocksResultsPage(BasePage):
         options[allowed_amounts.index(amount)].click()
         self.wait_pagination()
 
-    @benchmark_function
     def has_next_page(self):
         return self.find_one(self.Locators.next_page_button).is_enabled()
 
-    @benchmark_function
     def next_page(self):
         next_button = self.find_one(self.Locators.next_page_button)
         next_button.click()
@@ -84,6 +82,7 @@ class StocksResultsPage(BasePage):
                 # If it fails again, give up
                 self.wait_pagination(retry=False)
 
+    @benchmark_function
     def _refresh(self):
         self.driver.refresh()
 
