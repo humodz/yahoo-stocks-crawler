@@ -1,4 +1,6 @@
 import re
+from functools import wraps
+from time import time
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -42,13 +44,24 @@ def split_into_chunks(items, chunk_size):
         yield items[i:i + chunk_size]
 
 
+def benchmark_function(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            print('benchmark_function:', func.__qualname__, time() - start)
+
+    return wrapper
+
+
 class ChromeDriver:
     def __init__(self, options=None):
         self.driver = None
-        self.options = None
+        self.options = Options()
 
-        if options:
-            self.options = Options()
+        if options is not None:
             for option in options:
                 self.options.add_argument(option)
 
@@ -58,4 +71,5 @@ class ChromeDriver:
 
     def __exit__(self, *args, **kwargs):
         if self.driver:
+            return
             self.driver.quit()

@@ -1,25 +1,22 @@
-from selenium import webdriver
 
-from app.utils import parse_amount, ChromeDriver
+from app.utils import ChromeDriver, benchmark_function
 from .pages import StocksSearchPage
 
-# driver = webdriver.Chrome()
+b = benchmark_function
 
-with ChromeDriver(['--headless']) as driver:
-# with ChromeDriver() as driver:
+with ChromeDriver(None and ['--headless']) as driver:
+    driver.set_window_size(800, 600)
     search_form = StocksSearchPage(driver)
 
-    search_form.open()
-    search_form.clear_default_selection()
-    regions = search_form.open_regions_dropdown()
+    b(search_form.open)()
+    regions = b(search_form.open_regions_dropdown)()
 
     regions['Argentina'].toggle()
 
-    results_page = search_form.search_stocks()
+    results_page = b(search_form.search_stocks)()
+    b(results_page.set_rows_per_page)(100)
 
-    results_page.set_rows_per_page(100)
+    all_results = b(list)(results_page.get_all_results())
 
-    #print(*results_page.get_current_results(), sep='\n')
+    print(len(all_results))
 
-
-# all_results = list(results_page.get_all_results())

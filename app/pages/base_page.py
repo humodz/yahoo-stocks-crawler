@@ -1,13 +1,17 @@
 from typing import List
 
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.support.ui import WebDriverWait
 
 
 class BasePage:
-    def __init__(self, driver, timeout_seconds=30):
+    driver: WebDriver
+    timeout: int
+
+    def __init__(self, driver, timeout=30):
         self.driver = driver
-        self.timeout = timeout_seconds
+        self.timeout = timeout
 
     def find_one(self, locator, root=None) -> WebElement:
         if root is None:
@@ -19,5 +23,8 @@ class BasePage:
             root = self.driver
         return root.find_elements(*locator)
 
-    def wait_until(self, what):
-        return WebDriverWait(self.driver, self.timeout).until(what)
+    def wait_until(self, what, timeout = None):
+        if timeout is None:
+            timeout = self.timeout
+
+        return WebDriverWait(self.driver, timeout).until(what)
