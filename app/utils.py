@@ -1,6 +1,7 @@
 import re
 from functools import wraps
 from time import time
+from typing import Optional
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -57,8 +58,13 @@ def benchmark_function(func):
 
 
 class ChromeDriver:
-    def __init__(self, options=None):
+    driver: Optional[webdriver.Chrome]
+
+    # Note: if keep_open=True, the browser and driver will keep running on background
+    # and need to be killed manually, e.g.: pgrep chrome | xargs kill
+    def __init__(self, options=None, keep_open=False):
         self.driver = None
+        self.keep_open = keep_open
         self.options = Options()
 
         if options is not None:
@@ -70,5 +76,6 @@ class ChromeDriver:
         return self.driver
 
     def __exit__(self, *args, **kwargs):
-        if self.driver:
+        if not self.keep_open and self.driver is not None:
             self.driver.quit()
+            self.driver = None

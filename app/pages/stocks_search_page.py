@@ -14,11 +14,11 @@ class StocksSearchPage(BasePage):
         )
         region_checkboxes = (By.CSS_SELECTOR, '#dropdown-menu label')
         find_stocks_button = (By.CSS_SELECTOR, 'button[data-test=find-stock]')
-        results_table = (By.CSS_SELECTOR, '#fin-scr-res-table table')
+        results_indicator = (By.CSS_SELECTOR, '#fin-scr-res-table [data-test=table-toolbar]')
 
     class Checkbox:
-        def __init__(self, element):
-            self.name = element.get_attribute('innerText')
+        def __init__(self, name, element):
+            self.name = name
             self.element = element
 
         def toggle(self):
@@ -47,14 +47,13 @@ class StocksSearchPage(BasePage):
         region_names = self.driver.execute_script('return arguments[0].map(e => e.innerText)', region_checkboxes)
 
         return {
-            name: self.Checkbox(checkbox)
+            name: self.Checkbox(name, checkbox)
             for name, checkbox in zip(region_names, region_checkboxes)
         }
 
     def search_stocks(self):
         button = self.wait_until(ec.element_to_be_clickable(self.Locators.find_stocks_button))
         button.click()
-        self.wait_until(ec.presence_of_element_located(self.Locators.results_table))
+        self.wait_until(ec.presence_of_element_located(self.Locators.results_indicator))
 
-        results_page = StocksResultsPage(self.driver, self.timeout)
-        return results_page
+        return StocksResultsPage(self.driver, self.timeout)

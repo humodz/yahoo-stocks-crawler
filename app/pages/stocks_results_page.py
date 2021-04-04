@@ -1,3 +1,5 @@
+import re
+
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
@@ -15,12 +17,16 @@ class StocksResultsPage(BasePage):
         next_page_button = (By.CSS_SELECTOR, '#scr-res-table > div:nth-child(2) > button:nth-child(4)')
         loading_overlay_present = (By.CSS_SELECTOR, '#scr-res-table:nth-child(3)')
         loading_overlay_not_present = (By.CSS_SELECTOR, '#scr-res-table:nth-child(2)')
+        result_information = (By.CSS_SELECTOR, '#fin-scr-res-table > :first-child')
         result_table = (By.CSS_SELECTOR, '#scr-res-table table')
         result_header = (By.CSS_SELECTOR, '#scr-res-table thead th')
-        all_cells = (By.CSS_SELECTOR, '#scr-res-table tbody td')
+        result_cells = (By.CSS_SELECTOR, '#scr-res-table tbody td')
 
     @benchmark_function
     def get_current_results(self):
+        if self.total_results() == 0:
+            return []
+
         def row_to_dict(cells):
             # Manually iterating and calling .get_attribute in Python: ~20 seconds (100 rows)
             # .execute_script: ~2 seconds (100 rows)
@@ -32,13 +38,17 @@ class StocksResultsPage(BasePage):
             return {name: value for name, value in names_and_values}
 
         total_columns = len(self.find_all(self.Locators.result_header))
-        all_cells = self.find_all(self.Locators.all_cells)
-        rows = split_into_chunks(all_cells, total_columns)
+        all_cells = self.find_all(self.Locators.result_cells)
+        rows = list(split_into_chunks(all_cells, total_columns))
 
         results = [row_to_dict(row) for row in rows]
         return results
 
     def set_rows_per_page(self, amount):
+        # If the results fit in a single page, the "Show N Rows" dropdown won't exist
+        if not self.has_next_page():
+            return
+
         allowed_amounts = [25, 50, 100]
 
         if amount not in allowed_amounts:
@@ -50,10 +60,23 @@ class StocksResultsPage(BasePage):
         options[allowed_amounts.index(amount)].click()
         self.wait_pagination()
 
+    def total_results(self):
+        # Some regions have zero results, e.g. Bahrain
+        info = self.find_one(self.Locators.result_information).get_property('innerText')
+        regexp = re.compile(r'of (\d+) results')
+        total = regexp.search(info).group(1)
+        return int(total)
+
     def has_next_page(self):
-        return self.find_one(self.Locators.next_page_button).is_enabled()
+        # If the results fit in a single page the Next Page button isn't created, but checking if it doesn't exist
+        # may cause false positives if the page errors
+        info = self.find_one(self.Locators.result_information).get_property('innerText')
+        regexp = re.compile(r'\d+-(\d+) of (\d+) results')
+        current, total = regexp.search(info).groups()
+        return current != total
 
     def next_page(self):
+        # Note: if the results fit in a single page, this button won't exist
         next_button = self.find_one(self.Locators.next_page_button)
         next_button.click()
         self.wait_pagination()
@@ -82,7 +105,6 @@ class StocksResultsPage(BasePage):
                 # If it fails again, give up
                 self.wait_pagination(retry=False)
 
-    @benchmark_function
     def _refresh(self):
         self.driver.refresh()
 

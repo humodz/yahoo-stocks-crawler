@@ -4,16 +4,17 @@ from .pages import StocksSearchPage
 
 b = benchmark_function
 
-with ChromeDriver(None and ['--headless']) as driver:
-    driver.set_window_size(800, 600)
+with ChromeDriver(['--headless'], keep_open=False) as driver:
+# with ChromeDriver(None, keep_open=True) as driver:
     search_form = StocksSearchPage(driver)
 
     b(search_form.open)()
     regions = b(search_form.open_regions_dropdown)()
 
-    regions['Argentina'].toggle()
+    regions['Qatar'].toggle()
 
-    results_page = b(search_form.search_stocks)()
+    results_page = search_form.search_stocks()
+
     b(results_page.set_rows_per_page)(100)
 
     all_results = b(list)(results_page.get_all_results())
