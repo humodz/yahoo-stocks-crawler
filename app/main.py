@@ -1,8 +1,8 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 
 from app.dependencies import Crawler
+from app.dependencies.crawler import InvalidRegion
 from app.model import RegionsResponse, StockItem, StocksResponse
-
 
 app = FastAPI()
 
@@ -26,14 +26,26 @@ def get_regions(crawler: Crawler = Depends(Crawler)):
     }
 
 
-@app.get('/stocks', response_model=StocksResponse)
+@app.get(
+    '/stocks',
+    response_model=StocksResponse,
+    responses={
+        400: {'description': 'Invalid Region'}
+    }
+)
 def get_stocks(region: str, crawler: Crawler = Depends(Crawler)):
     '''
         List stock prices for the given region.<br>
         Returns an object whose keys are the stock symbols.
     '''
 
-    raw_results = crawler.get_stocks(region)
+    try:
+        raw_results = crawler.get_stocks(region)
+    except InvalidRegion as error:
+        raise HTTPException(status_code=400, detail={
+            'code': 'INVALID_REGION',
+            'message': str(error),
+        })
 
     return {
         item['Symbol']: StockItem.from_table_row(item)

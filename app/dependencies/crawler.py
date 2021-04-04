@@ -1,16 +1,13 @@
 from fastapi import HTTPException
+from pydantic import BaseModel
 
 from app.pages import StocksSearchPage
 from app.utils import ChromeDriver
 
 
-class InvalidRegion(HTTPException):
+class InvalidRegion(Exception):
     def __init__(self, region):
-        super().__init__(status_code=400, detail={
-            'code': 'INVALID_REGION',
-            'message': f'Invalid region: {region}',
-            'region': region,
-        })
+        super().__init__(f'Invalid region: {region}')
         self.region = region
 
 
