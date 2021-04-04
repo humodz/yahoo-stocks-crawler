@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
 
-from app.dependencies.crawler import Crawler
-from app.utils import parse_amount
+from app.dependencies import Crawler
+from app.model import RegionsResponse, StockItem, StocksResponse
 
 
 app = FastAPI()
@@ -14,10 +14,10 @@ def hello_world():
     }
 
 
-@app.get('/regions')
+@app.get('/regions', response_model=RegionsResponse)
 def get_regions(crawler: Crawler = Depends(Crawler)):
     '''
-        Returns a list of valid regions to fetch stocks.
+        List valid regions to fetch stocks from.
     '''
 
     regions = crawler.get_regions()
@@ -26,25 +26,17 @@ def get_regions(crawler: Crawler = Depends(Crawler)):
     }
 
 
-@app.get('/stocks')
+@app.get('/stocks', response_model=StocksResponse)
 def get_stocks(region: str, crawler: Crawler = Depends(Crawler)):
     '''
-        Returns a list of stock prices for the given region.
+        List stock prices for the given region.<br>
+        Returns an object whose keys are the stock symbols.
     '''
 
     raw_results = crawler.get_stocks(region)
 
-    # Always show 2 decimal places
-    currency = '{:.2f}'.format
-
-    results = {
-        item['Symbol']: {
-            'symbol': item['Symbol'],
-            'name': item['Name'],
-            'price': currency(parse_amount(item['Price (Intraday)'])),
-        }
+    return {
+        item['Symbol']: StockItem.from_table_row(item)
         for item in raw_results
     }
-
-    return results
 
