@@ -1,4 +1,7 @@
+from fastapi import Depends
+
 from app.pages import StocksSearchPage
+from app.settings import get_settings
 from app.utils import ChromeDriver
 
 
@@ -9,11 +12,8 @@ class InvalidRegion(Exception):
 
 
 class Crawler:
-    def __init__(self):
-        # self.settings = None
-        self.settings = [
-            '--headless'
-        ]
+    def __init__(self, settings=Depends(get_settings)):
+        self.settings = settings.webdriver_args
 
     def get_regions(self):
         with ChromeDriver(self.settings) as driver:
