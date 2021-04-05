@@ -2,7 +2,10 @@ import json
 from functools import wraps
 
 from fastapi import Depends
+from pydantic import RedisDsn
 from redis import Redis
+
+from app.settings import get_settings
 
 
 class RedisBackend:
@@ -15,19 +18,21 @@ class RedisBackend:
         return cls.redis
 
     @classmethod
-    def connect(cls):
-        # TODO configuration
-        cls.redis = Redis()
+    def connect(cls, url: RedisDsn):
+        cls.redis = Redis.from_url(url)
 
 
 class Cache:
     redis: Redis
     expiration_ms: float
 
-    def __init__(self, redis=Depends(RedisBackend.inject)):
+    def __init__(
+            self,
+            redis=Depends(RedisBackend.inject),
+            settings=Depends(get_settings),
+    ):
         self.redis = redis
-        # TODO configuration
-        self.expiration_ms = (60 * 3 + 13) * 1000
+        self.expiration_ms = settings.cache_ttl_ms
 
     def set(self, key, value, expiration_ms=None):
         if expiration_ms is None:

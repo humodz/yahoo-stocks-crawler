@@ -7,18 +7,34 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 
+# Example: +10,000.00M
+parse_amount_regexp = re.compile(r'([-+])?((?:\d+,)*\d+(\.\d+)?)([%MBT])?')
+
+# Example: 30d 24h 60m 60s 999ms
+parse_duration_regexp = re.compile(
+    r'\s*' +
+    r'(?:(\d+)\s*d)?\s*' +  # days
+    r'(?:(\d+)\s*h)?\s*' +  # hours
+    r'(?:(\d+)\s*m)?\s*' +  # minutes
+    r'(?:(\d+)\s*s)?\s*' +  # seconds
+    r'(?:(\d+)\s*ms)?\s*'   # milliseeconds
+)
+
+
 def parse_amount(raw_value: str):
-    raw_value = raw_value.strip().replace(',', '')
+    raw_value = raw_value.strip()
 
     if raw_value == '' or raw_value.upper() == 'N/A':
         return None
 
-    # Example: +10000.00M
-    regexp = re.compile(r'([-+])?(\d+(\.\d+)?)(\D)?')
+    regexp = parse_amount_regexp
+    pattern = regexp.fullmatch(raw_value)
+    if pattern is None:
+        raise ValueError('invalid amount string')
 
-    sign, str_value, _, modifier = regexp.match(raw_value).groups()
+    sign, str_value, _, modifier = pattern.groups()
 
-    result = float(str_value)
+    result = float(str_value.replace(',', ''))
 
     if sign == '-':
         result = -result
@@ -32,11 +48,27 @@ def parse_amount(raw_value: str):
             'T': 1000 ** 4,
         }
 
-        if modifier not in modifiers:
-            raise RuntimeError(f'Unknown modifier: {modifier}')
         result = result * modifiers[modifier]
 
     return result
+
+
+def parse_duration_to_ms(text: str):
+    if len(text.strip()) == 0:
+        raise ValueError('invalid duration string')
+
+    pattern = parse_duration_regexp.fullmatch(text)
+    if pattern is None:
+        raise ValueError('invalid duration string')
+
+    days, hrs, mins, secs, ms = [parse_maybe_int(v) for v in pattern.groups()]
+    return ms + 1000 * (secs + 60 * (mins + 60 * (hrs + 24 * days)))
+
+
+def parse_maybe_int(text: Optional[str]):
+    if text is None:
+        return 0
+    return int(text)
 
 
 def split_into_chunks(items, chunk_size):

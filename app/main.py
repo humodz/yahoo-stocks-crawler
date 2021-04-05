@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 
 from app.dependencies import Crawler, RedisBackend, Cache, InvalidRegion
 from app.model import RegionsResponse, StockItem, StocksResponse
+from app.settings import get_settings
 
 app = FastAPI()
 
@@ -77,4 +78,5 @@ def get_stocks(
 
 @app.on_event('startup')
 def initialize():
-    RedisBackend.connect()
+    settings = get_settings()
+    RedisBackend.connect(settings.redis_url)
