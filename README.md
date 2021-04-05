@@ -2,13 +2,7 @@
 
 ### Dependencies
 
-- python3
-    - selenium
-    - fastapi
-    - uvicorn[standard]
-    - pydantic
-- chromedriver
-    - https://sites.google.com/a/chromium.org/chromedriver/downloads
+https://sites.google.com/a/chromium.org/chromedriver/downloads
 
 ### Links
 
