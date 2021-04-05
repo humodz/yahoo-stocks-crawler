@@ -1,3 +1,7 @@
+'''
+    Testing script for the crawler
+'''
+
 
 from app.utils import ChromeDriver, benchmark_function
 from .pages import StocksSearchPage
@@ -5,7 +9,6 @@ from .pages import StocksSearchPage
 b = benchmark_function
 
 with ChromeDriver(['--headless'], keep_open=False) as driver:
-# with ChromeDriver(None, keep_open=True) as driver:
     search_form = StocksSearchPage(driver)
 
     b(search_form.open)()

@@ -1,0 +1,11 @@
+version: '2'
+
+# TODO redis
+
+services:
+  app:
+    build:
+      context: ..  # This is relative to the docker-compose.yml location
+      dockerfile: docker/Dockerfile
+    security_opt:
+      - 'seccomp:docker/seccomp-chrome.json'

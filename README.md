@@ -1,4 +1,4 @@
-# yahoo-news-crawler
+# yahoo-stocks-crawler
 
 ### Dependencies
 
@@ -6,14 +6,19 @@
     - selenium
     - fastapi
     - uvicorn[standard]
+    - pydantic
 - chromedriver
     - https://sites.google.com/a/chromium.org/chromedriver/downloads
 
+### Links
+
+- https://github.com/Zenika/alpine-chrome
+
 ### TODO
 
-- [ ] dependencias
- - [ ] trocar p/ poetry; ou
- - [ ] fazer requirements txt
-- [ ] webdriver
- - [ ] achar jeito legal de baixar driver e navegador
-- [ ] docker-compose
+- [ ] usar poetry
+- [ ] terminar docker
+- [ ] escrever testes
+- [ ] CI?
+- [ ] mais links
+- [ ] mais docs
