@@ -1,6 +1,3 @@
-from fastapi import HTTPException
-from pydantic import BaseModel
-
 from app.pages import StocksSearchPage
 from app.utils import ChromeDriver
 
