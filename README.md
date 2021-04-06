@@ -2,7 +2,11 @@
 
 ### Dependencies
 
-https://sites.google.com/a/chromium.org/chromedriver/downloads
+- Poetry
+    - https://python-poetry.org/
+- chromedriver
+    - `apt-get install chromedriver`; or
+    - https://sites.google.com/a/chromium.org/chromedriver/downloads
 
 ### Links
 
@@ -10,8 +14,6 @@ https://sites.google.com/a/chromium.org/chromedriver/downloads
 
 ### TODO
 
-- [ ] usar poetry
-- [ ] terminar docker
 - [ ] escrever testes
 - [ ] CI?
 - [ ] mais links
