@@ -14,6 +14,7 @@ ENV PYTHONFAULTHANDLER=1 \
 
 
 
+# Build in a separate stage, so that the final image doesn't need to include poetry and build tools (e.g. gcc)
 FROM base AS builder
 
 ENV PIP_DEFAULT_TIMEOUT=100 \

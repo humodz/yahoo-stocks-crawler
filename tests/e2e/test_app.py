@@ -25,10 +25,27 @@ def test_regions(client):
     # These are used in the following tests
     assert 'Bahrain' in body['regions']
     assert 'Qatar' in body['regions']
+    assert 'Belgium' in body['regions']
 
 
-def test_stocks(client: TestClient):
+# Qatar has < 100 results
+def test_stocks_single_page(client: TestClient):
     response = client.get('/stocks', params={'region': 'Qatar'})
+    body = response.json()
+
+    assert response.status_code == 200
+    assert body == DictOf(
+        key=Any(str),
+        value={
+            'name': Any(str),
+            'symbol': Any(str),
+            'price': Any(str),
+        }
+    )
+
+# Belgium has > 100, < 200 results
+def test_stocks_two_pages(client: TestClient):
+    response = client.get('/stocks', params={'region': 'Belgium'})
     body = response.json()
 
     assert response.status_code == 200
