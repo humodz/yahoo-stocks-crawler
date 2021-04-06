@@ -4,6 +4,7 @@
 """
 
 import pytest
+from _pytest.mark.structures import NodeKeywords
 from starlette.testclient import TestClient
 
 from app.dependencies import RedisBackend
@@ -19,9 +20,10 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def redis_cleanup_every_test(client: TestClient):
-    redis = RedisBackend.inject()
-    redis.flushdb()
-    yield
-    redis.flushdb()
+def redis_cleanup_every_test(request):
+    if request.node.get_closest_marker('e2e') is not None:
+        redis = RedisBackend.inject()
+        redis.flushdb()
+        yield
+        redis.flushdb()
 
