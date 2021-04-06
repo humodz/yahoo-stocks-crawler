@@ -28,3 +28,9 @@ class BasePage:
             timeout = self.timeout
 
         return WebDriverWait(self.driver, timeout).until(what)
+
+    def wait_until_not(self, what, timeout=None):
+        if timeout is None:
+            timeout = self.timeout
+
+        return WebDriverWait(self.driver, timeout).until_not(what)
