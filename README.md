@@ -14,7 +14,10 @@
 
 ### TODO
 
-- [ ] escrever testes
+- [ ] unit tests
+    - [ ] testar ListOf DictOf?
+    - [ ] parse_amount, parse_duration
+- [ ] mais cache?
 - [ ] CI?
 - [ ] mais links
 - [ ] mais docs
