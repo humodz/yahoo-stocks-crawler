@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "yahoo-stocks-crawler"
+name = "app"
 version = "0.1.0"
 description = ""
 authors = ["Hugo Dzin <humodz065@gmail.com>"]

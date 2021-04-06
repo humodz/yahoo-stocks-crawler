@@ -1,7 +1,5 @@
 version: '2'
 
-# TODO redis
-
 services:
   app:
     build:
@@ -9,3 +7,17 @@ services:
       dockerfile: docker/Dockerfile
     security_opt:
       - 'seccomp:docker/seccomp-chrome.json'
+    ports:
+      - '8000:8000'
+    environment:
+      REDIS_URL: 'redis://redis:6379/0'
+  redis:
+    image: redis
+    command: ['redis-server', '--appendonly', 'yes']
+#    ports:
+#      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
