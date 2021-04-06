@@ -23,7 +23,7 @@ class BasePage:
             root = self.driver
         return root.find_elements(*locator)
 
-    def wait_until(self, what, timeout = None):
+    def wait_until(self, what, timeout=None):
         if timeout is None:
             timeout = self.timeout
 

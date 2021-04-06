@@ -1,6 +1,6 @@
-'''
+"""
     Testing script for the crawler
-'''
+"""
 
 
 from app.utils import ChromeDriver, benchmark_function

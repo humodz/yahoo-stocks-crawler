@@ -43,6 +43,7 @@ def test_stocks_single_page(client: TestClient):
         }
     )
 
+
 # Belgium has > 100, < 200 results
 def test_stocks_two_pages(client: TestClient):
     response = client.get('/stocks', params={'region': 'Belgium'})
