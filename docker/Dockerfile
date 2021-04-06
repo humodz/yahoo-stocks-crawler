@@ -1,10 +1,10 @@
-FROM python:3.9-alpine
+# https://pythonspeed.com/articles/alpine-docker-python/
+FROM python:3.9-slim as base
 
-RUN apk add --update --no-cache \
-    chromium-chromedriver \
-    chromium
+COPY docker/install-packages.sh .
+RUN ./install-packages.sh chromium chromium-driver
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN groupadd appgroup --system && useradd appuser -g appgroup --create-home
 USER appuser
 WORKDIR /home/appuser
 

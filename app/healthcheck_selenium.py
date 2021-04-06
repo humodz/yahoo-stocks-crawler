@@ -13,8 +13,8 @@ try:
     options.add_argument('--headless')
 
     driver = webdriver.Chrome(options=options)
-    driver.get('https://example.org')
-    # driver.get('https://finance.yahoo.com/screener/new')
+    # driver.get('https://example.org')
+    driver.get('https://finance.yahoo.com/screener/new')
 
     print('=' * 10, 'title', '=' * 9)
     print(driver.title)
