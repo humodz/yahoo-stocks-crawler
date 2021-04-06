@@ -61,5 +61,5 @@ def test_stocks_zero_results(client: TestClient):
     body = response.json()
 
     assert response.status_code == 200
-    assert body == Any(dict)
+    assert type(body) == dict
     assert len(body) == 0
