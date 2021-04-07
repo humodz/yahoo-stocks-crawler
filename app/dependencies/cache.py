@@ -28,8 +28,8 @@ class Cache:
 
     def __init__(
             self,
-            redis: Redis =Depends(RedisBackend.inject),
-            settings: Settings =Depends(get_settings),
+            redis: Redis = Depends(RedisBackend.inject),
+            settings: Settings = Depends(get_settings),
     ):
         self.redis = redis
         self.expiration_ms = int(1000 * settings.cache_ttl.total_seconds())
@@ -56,5 +56,7 @@ class Cache:
 
                 result = func(*args, **kwargs)
                 return self.set(key, result)
+
             return wrapper
+
         return decorator

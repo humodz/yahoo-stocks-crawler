@@ -1,10 +1,9 @@
 """
-    Globally available fixtures.
-    https://docs.pytest.org/en/stable/fixture.html#scope-sharing-fixtures-across-classes-modules-packages-or-session
+Globally available fixtures.
+https://docs.pytest.org/en/stable/fixture.html#scope-sharing-fixtures-across-classes-modules-packages-or-session
 """
 
 import pytest
-from _pytest.mark.structures import NodeKeywords
 from starlette.testclient import TestClient
 
 from app.dependencies import RedisBackend

@@ -1,5 +1,5 @@
 """
-    Testing script for the crawler
+Manual testing script for the crawler
 """
 
 

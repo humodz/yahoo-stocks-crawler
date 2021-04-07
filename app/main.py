@@ -2,7 +2,6 @@ from fastapi import FastAPI, Depends, HTTPException
 
 from app.dependencies import Crawler, RedisBackend, Cache, InvalidRegion
 from app.model import RegionsResponse, StockItem, StocksResponse
-from app.pages.stocks_results_page import MaximumResultsExceeded
 from app.settings import get_settings
 
 app = FastAPI()

@@ -1,5 +1,5 @@
 """
-    Use this to test if selenium, chrome and chromedriver are working properly
+Use this to test if selenium, chrome and chromedriver are working properly
 """
 
 from selenium import webdriver

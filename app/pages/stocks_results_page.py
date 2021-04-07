@@ -31,7 +31,6 @@ class StocksResultsPage(BasePage):
         result_header = (By.CSS_SELECTOR, '#scr-res-table thead th')
         result_cells = (By.CSS_SELECTOR, '#scr-res-table tbody td')
 
-    @benchmark_function
     def get_current_results(self):
         if self.total_results() == 0:
             return []
@@ -90,7 +89,6 @@ class StocksResultsPage(BasePage):
         next_button.click()
         self.wait_pagination()
 
-    @benchmark_function
     def wait_pagination(self, retry=True):
         try:
             # Wait a bit for the result table to disappear, to be sure we don't advance too fast.

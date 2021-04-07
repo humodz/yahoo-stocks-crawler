@@ -36,7 +36,6 @@ def test_regions(client: TestClient):
 @pytest.mark.e2e
 @pytest.mark.parametrize('region', ['Qatar', 'Belgium'])
 def test_stocks(client: TestClient, region: str):
-    print('HELLO', region)
     response = client.get('/stocks', params={'region': region})
     body = response.json()
 
