@@ -1,5 +1,6 @@
 import json
 from functools import wraps
+from typing import Optional
 
 from fastapi import Depends
 from pydantic import RedisDsn
@@ -22,6 +23,14 @@ class RedisBackend:
         cls.redis = Redis.from_url(url)
 
 
+class CacheKey:
+    regions = 'cache:regions'
+
+    @staticmethod
+    def stocks(region):
+        return f'cache:stocks:{region}'
+
+
 class Cache:
     redis: Redis
     expiration_ms: float
@@ -34,7 +43,7 @@ class Cache:
         self.redis = redis
         self.expiration_ms = int(1000 * settings.cache_ttl.total_seconds())
 
-    def set(self, key, value, expiration_ms=None):
+    def set(self, key: str, value, expiration_ms: Optional[int] = None):
         if expiration_ms is None:
             expiration_ms = self.expiration_ms
 
@@ -42,17 +51,22 @@ class Cache:
         self.redis.set(key, serialized, px=expiration_ms)
         return value
 
-    def get(self, key):
-        return self.redis.get(key)
+    def get(self, key: str):
+        raw_value = self.redis.get(key)
 
-    def decorate(self, key):
+        if raw_value is None:
+            return None
+
+        return json.loads(raw_value)
+
+    def decorate(self, key: str):
         def decorator(func):
             @wraps(func)
             def wrapper(*args, **kwargs):
                 cached = self.get(key)
 
                 if cached is not None:
-                    return json.loads(cached)
+                    return cached
 
                 result = func(*args, **kwargs)
                 return self.set(key, result)

@@ -5,13 +5,9 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 
-from app.utils import split_into_chunks, benchmark_function
+from app.errors import MaximumResultsExceeded
+from app.utils import split_into_chunks
 from .base_page import BasePage
-
-
-class MaximumResultsExceeded(Exception):
-    def __init__(self, max_results):
-        super().__init__(f'Yahoo Finance can only display up to {max_results} results')
 
 
 class StocksResultsPage(BasePage):

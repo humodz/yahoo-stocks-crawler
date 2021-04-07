@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 
-from app.dependencies import Crawler, RedisBackend, Cache, InvalidRegion
+from app.dependencies import Crawler, RedisBackend, Cache, CacheKey
+from app.errors import InvalidRegion
 from app.model import RegionsResponse, StockItem, StocksResponse
 from app.settings import get_settings
 
@@ -22,7 +23,7 @@ def get_regions(
     """
     List valid regions to fetch stocks from.
     """
-    @cache.decorate('cache:regions')
+    @cache.decorate(CacheKey.regions)
     def get_regions_with_cache():
         return crawler.get_regions()
 
@@ -49,32 +50,22 @@ def get_stocks(
     Returns an object whose keys are the stock symbols.<br>
     Note: The Yahoo finance screener can only return up to 10000 results.
     """
-    @cache.decorate(f'cache:stocks:{region}')
+    @cache.decorate(CacheKey.stocks(region))
     def get_stocks_with_cache():
         try:
-            raw_results = crawler.get_stocks(region)
+            results = crawler.get_stocks(region)
         except InvalidRegion as error:
-            return {
-                'status': 400,
-                'error': {'code': 'INVALID_REGION', 'message': str(error)}
-            }
+            raise HTTPException(
+                status_code=400,
+                detail={'code': 'INVALID_REGION', 'message': str(error)},
+            )
 
         return {
-            'data': {
-                item['Symbol']: StockItem.from_table_row(item).dict()
-                for item in raw_results
-            }
+            item['Symbol']: StockItem.from_table_row(item).dict()
+            for item in results
         }
 
-    result = get_stocks_with_cache()
-
-    if 'error' in result:
-        raise HTTPException(
-            status_code=result['status'],
-            detail=result['error'],
-        )
-
-    return result['data']
+    return get_stocks_with_cache()
 
 
 @app.on_event('startup')

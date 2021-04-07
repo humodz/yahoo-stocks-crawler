@@ -1,3 +1,5 @@
+from typing import Dict
+
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.by import By
 
@@ -38,7 +40,7 @@ class StocksSearchPage(BasePage):
     def _clear_default_selection(self):
         self.find_one(self.Locators.default_selected_region).click()
 
-    def open_regions_dropdown(self):
+    def open_regions_dropdown(self) -> Dict[str, Checkbox]:
         self.find_one(self.Locators.show_regions_button).click()
         region_checkboxes = self.find_all(self.Locators.region_checkboxes)
 
