@@ -21,9 +21,13 @@ def client():
 
 @pytest.fixture(autouse=True)
 def redis_cleanup_every_test(request):
-    if request.node.get_closest_marker('e2e') is not None:
-        redis = RedisBackend.inject()
-        redis.flushdb()
+    if request.node.get_closest_marker('e2e') is None:
         yield
-        redis.flushdb()
+        return
+
+    redis = RedisBackend.inject()
+    redis.flushdb()
+    yield
+    redis.flushdb()
+
 
