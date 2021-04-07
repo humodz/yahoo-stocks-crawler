@@ -117,7 +117,7 @@ class StocksResultsPage(BasePage):
     def _hide_floating_header(self):
         # This header sometimes obscures buttons and causes errors
         header = self.find_one(self.Locators.floating_header)
-        self.driver.execute_script('arguments[0].style.display = "none !important"', header)
+        self.driver.execute_script('arguments[0].style.display = "none"', header)
 
     def get_all_results(self, stop_before_error=True):
         """

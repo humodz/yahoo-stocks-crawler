@@ -35,7 +35,7 @@ class StocksSearchPage(BasePage):
     def _hide_floating_header(self):
         # This header sometimes obscures buttons and causes errors
         header = self.find_one(self.Locators.floating_header)
-        self.driver.execute_script('arguments[0].style.display = "none !important"', header)
+        self.driver.execute_script('arguments[0].style.display = "none"', header)
 
     def _clear_default_selection(self):
         self.find_one(self.Locators.default_selected_region).click()

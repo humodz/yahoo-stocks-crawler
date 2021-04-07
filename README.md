@@ -8,19 +8,24 @@
 
 ### Commands
 
-##### Install dependencies
+#### Install dependencies
 ```sh 
 poetry install
 ```
-##### Run server (will start Redis)
+
+#### Run server (will start Redis)
 ```sh
 poetry run ./scripts/start.sh
 ```
-##### Run tests (will start Redis)
+Note: Requires chromedriver to be available in PATH
+
+#### Run tests (will start Redis)
 ```sh 
 poetry run ./scripts/test.sh
 ```
-##### Run server using Docker
+Note: Requires chromedriver to be available in PATH
+
+#### Run server using Docker
 ```sh
 ./scripts/docker-compose.sh up --build
 ```
