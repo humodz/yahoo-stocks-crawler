@@ -5,7 +5,7 @@ from fastapi import Depends
 from pydantic import RedisDsn
 from redis import Redis
 
-from app.settings import get_settings
+from app.settings import get_settings, Settings
 
 
 class RedisBackend:
@@ -28,11 +28,11 @@ class Cache:
 
     def __init__(
             self,
-            redis=Depends(RedisBackend.inject),
-            settings=Depends(get_settings),
+            redis: Redis =Depends(RedisBackend.inject),
+            settings: Settings =Depends(get_settings),
     ):
         self.redis = redis
-        self.expiration_ms = settings.cache_ttl_ms
+        self.expiration_ms = int(1000 * settings.cache_ttl.total_seconds())
 
     def set(self, key, value, expiration_ms=None):
         if expiration_ms is None:

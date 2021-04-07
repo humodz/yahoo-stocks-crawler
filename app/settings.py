@@ -1,20 +1,15 @@
 import os
+from datetime import timedelta
 from functools import lru_cache
 from typing import List
 
-from pydantic import BaseSettings, Field, validator, RedisDsn
-
-from app.utils import parse_duration_to_ms
+from pydantic import BaseSettings, RedisDsn
 
 
 class Settings(BaseSettings):
     webdriver_args: List[str] = ['--headless']
-    cache_ttl_ms: int = Field('3m 13s', env='cache_ttl')
+    cache_ttl: timedelta = timedelta(minutes=3, seconds=13)
     redis_url: RedisDsn = 'redis://localhost:6379/0'
-
-    @validator('cache_ttl_ms', pre=True)
-    def ttl_is_valid_duration(cls, value):
-        return parse_duration_to_ms(value)
 
 
 @lru_cache()

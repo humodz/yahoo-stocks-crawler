@@ -10,16 +10,6 @@ from selenium.webdriver.chrome.options import Options
 # Example: +10,000.00M
 parse_amount_regexp = re.compile(r'([-+])?((?:\d+,)*\d+(\.\d+)?)([%MBT])?')
 
-# Example: 30d 24h 60m 60s 999ms
-parse_duration_regexp = re.compile(
-    r'\s*' +
-    r'(?:(\d+)\s*d)?\s*' +  # days
-    r'(?:(\d+)\s*h)?\s*' +  # hours
-    r'(?:(\d+)\s*m)?\s*' +  # minutes
-    r'(?:(\d+)\s*s)?\s*' +  # seconds
-    r'(?:(\d+)\s*ms)?\s*'   # milliseeconds
-)
-
 
 def parse_amount(raw_value: str):
     raw_value = raw_value.strip()
@@ -51,24 +41,6 @@ def parse_amount(raw_value: str):
         result = result * modifiers[modifier]
 
     return result
-
-
-def parse_duration_to_ms(text: str):
-    if len(text.strip()) == 0:
-        raise ValueError('invalid duration string')
-
-    pattern = parse_duration_regexp.fullmatch(text)
-    if pattern is None:
-        raise ValueError('invalid duration string')
-
-    days, hrs, mins, secs, ms = [parse_maybe_int(v) for v in pattern.groups()]
-    return ms + 1000 * (secs + 60 * (mins + 60 * (hrs + 24 * days)))
-
-
-def parse_maybe_int(text: Optional[str]):
-    if text is None:
-        return 0
-    return int(text)
 
 
 def split_into_chunks(items, chunk_size):
