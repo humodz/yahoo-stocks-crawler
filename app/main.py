@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException
 
 from app.dependencies import Crawler, RedisBackend, Cache, InvalidRegion
 from app.model import RegionsResponse, StockItem, StocksResponse
+from app.pages.stocks_results_page import MaximumResultsExceeded
 from app.settings import get_settings
 
 app = FastAPI()
@@ -20,7 +21,7 @@ def get_regions(
         cache: Cache = Depends(Cache),
 ):
     """
-        List valid regions to fetch stocks from.
+    List valid regions to fetch stocks from.
     """
     @cache.decorate('cache:regions')
     def get_regions_with_cache():
@@ -45,8 +46,9 @@ def get_stocks(
         cache: Cache = Depends(Cache)
 ):
     """
-        List stock prices for the given region.<br>
-        Returns an object whose keys are the stock symbols.
+    List stock prices for the given region.<br>
+    Returns an object whose keys are the stock symbols.<br>
+    Note: The Yahoo finance screener can only return up to 10000 results.
     """
     @cache.decorate(f'cache:stocks:{region}')
     def get_stocks_with_cache():

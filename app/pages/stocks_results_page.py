@@ -1,4 +1,5 @@
 import re
+from itertools import islice
 
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.support import expected_conditions as ec
@@ -8,7 +9,15 @@ from app.utils import split_into_chunks, benchmark_function
 from .base_page import BasePage
 
 
+class MaximumResultsExceeded(Exception):
+    def __init__(self, max_results):
+        super().__init__(f'Yahoo Finance can only display up to {max_results} results')
+
+
 class StocksResultsPage(BasePage):
+    # The screener can't display past 10000 items, after that it always errors with "Unable to load Screener"
+    YAHOO_FINANCE_MAX_RESULTS = 10000
+
     class Locators:
         floating_header = (By.CSS_SELECTOR, '.YDC-Header')
         request_timeout_indicator = (By.CSS_SELECTOR, '#fin-scr-res-table > :nth-child(2) [data-icon=attention]')
@@ -81,6 +90,7 @@ class StocksResultsPage(BasePage):
         next_button.click()
         self.wait_pagination()
 
+    @benchmark_function
     def wait_pagination(self, retry=True):
         try:
             # Wait a bit for the result table to disappear, to be sure we don't advance too fast.
@@ -94,27 +104,38 @@ class StocksResultsPage(BasePage):
             self.wait_until(ec.visibility_of_element_located(self.Locators.result_table))
         except TimeoutException as timed_out:
             # Sometimes requests time out and the page errors. In that case, refresh and try again one time.
-            if retry:
-                # Using .find_all because it doesn't throw
-                if 0 == len(self.find_all(self.Locators.request_timeout_indicator)):
-                    # If the error indicator is not present, no idea what happened.
-                    raise timed_out
+            if not retry and not self.is_present(self.Locators.request_timeout_indicator):
+                if f'&offset={self.YAHOO_FINANCE_MAX_RESULTS}' in self.driver.current_url:
+                    raise MaximumResultsExceeded(self.YAHOO_FINANCE_MAX_RESULTS)
 
-                self._refresh()
-                self._hide_floating_header()
-                # If it fails again, give up
-                self.wait_pagination(retry=False)
+                # Unknown error
+                raise timed_out
+
+            self._refresh()
+            # If it fails again, give up
+            self.wait_pagination(retry=False)
 
     def _refresh(self):
         self.driver.refresh()
+        self._hide_floating_header()
 
     # This is duplicated from stocks_search_page ...
     def _hide_floating_header(self):
         # This header sometimes obscures buttons and causes errors
         header = self.find_one(self.Locators.floating_header)
-        self.driver.execute_script('arguments[0].style.display = "none"', header)
+        self.driver.execute_script('arguments[0].style.display = "none !important"', header)
 
-    def get_all_results(self):
+    def get_all_results(self, stop_before_error=True):
+        """
+        Returns all stocks for the given screener, iterating through the pages
+        :param stop_before_error: If False, then it may throw MaximumResultsExceeded
+        """
+        if stop_before_error:
+            return islice(self._get_all_results(), self.YAHOO_FINANCE_MAX_RESULTS)
+        else:
+            return self._get_all_results()
+
+    def _get_all_results(self):
         yield from self.get_current_results()
 
         while self.has_next_page():

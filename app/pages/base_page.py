@@ -23,6 +23,12 @@ class BasePage:
             root = self.driver
         return root.find_elements(*locator)
 
+    def is_present(self, locator, root=None):
+        """
+            Check if an element exists on the page, without throwing if it isn't
+        """
+        return len(self.find_all(locator, root)) != 0
+
     def wait_until(self, what, timeout=None):
         if timeout is None:
             timeout = self.timeout
