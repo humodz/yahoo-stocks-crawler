@@ -20,8 +20,6 @@ class StocksResultsPage(BasePage):
         open_rows_per_page = (By.CSS_SELECTOR, '#scr-res-table > div:nth-child(2) [data-test=select-container]')
         rows_per_page_options = (By.CSS_SELECTOR, '#scr-res-table [data-test=showRows-select-menu] > *')
         next_page_button = (By.CSS_SELECTOR, '#scr-res-table > div:nth-child(2) > button:nth-child(4)')
-        loading_overlay_present = (By.CSS_SELECTOR, '#scr-res-table:nth-child(3)')
-        loading_overlay_not_present = (By.CSS_SELECTOR, '#scr-res-table:nth-child(2)')
         result_information = (By.CSS_SELECTOR, '#fin-scr-res-table > :first-child')
         result_table = (By.CSS_SELECTOR, '#scr-res-table table')
         result_header = (By.CSS_SELECTOR, '#scr-res-table thead th')
@@ -111,10 +109,10 @@ class StocksResultsPage(BasePage):
 
     def _refresh(self):
         self.driver.refresh()
-        self._hide_floating_header()
+        self.hide_floating_header()
 
     # This is duplicated from stocks_search_page ...
-    def _hide_floating_header(self):
+    def hide_floating_header(self):
         # This header sometimes obscures buttons and causes errors
         header = self.find_one(self.Locators.floating_header)
         self.driver.execute_script('arguments[0].style.display = "none"', header)
